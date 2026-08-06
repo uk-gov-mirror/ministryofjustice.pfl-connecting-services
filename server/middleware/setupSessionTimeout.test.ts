@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import config from '../config';
 import paths from '../constants/paths';
+import { sessionMock } from '../test-utils/testMocks';
 
 import { checkSessionTimeout } from './setupSessionTimeout';
 
@@ -53,7 +54,26 @@ describe('setupSessionTimeout', () => {
     expect(next).toHaveBeenCalled();
     expect(response.locals.sessionTimeoutMs).toBe(config.session.expiryMinutes * 60 * 1000);
     expect(response.locals.sessionTimeoutSeconds).toBe(config.session.expiryMinutes * 60);
-    expect(response.locals.sessionTimeoutPath).toBe(paths.SESSION_TIMED_OUT);
+    expect(response.locals.sessionTimeoutPath).toBe(`${paths.SESSION_TIMED_OUT}?lang=en`);
+  });
+
+  it('should inject a Welsh session timeout path when the session language is Welsh', () => {
+    const request = {
+      path: paths.DOMESTIC_ABUSE,
+      originalUrl: paths.DOMESTIC_ABUSE,
+      method: 'GET',
+      session: {
+        completedSteps: [paths.CHILD_SAFETY],
+        pageHistory: [paths.START, paths.CHILD_SAFETY],
+        lang: 'cy',
+      },
+    } as unknown as Request;
+    const response = createMockResponse();
+
+    const next = runMiddleware(request, response);
+
+    expect(next).toHaveBeenCalled();
+    expect(response.locals.sessionTimeoutPath).toBe(`${paths.SESSION_TIMED_OUT}?lang=cy`);
   });
 
   it('should not inject session timeout config on the timeout page', () => {

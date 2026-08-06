@@ -35,9 +35,11 @@ export const checkSessionTimeout = (request: Request, response: Response, next: 
   const journeyStarted = hasUserStartedJourney(completedSteps, pageHistory);
 
   if (journeyStarted && path !== paths.SESSION_TIMED_OUT) {
+    const locale = request.session?.lang || 'en';
+
     response.locals.sessionTimeoutMs = config.session.expiryMinutes * 60 * 1000;
     response.locals.sessionTimeoutSeconds = config.session.expiryMinutes * 60;
-    response.locals.sessionTimeoutPath = paths.SESSION_TIMED_OUT;
+    response.locals.sessionTimeoutPath = `${paths.SESSION_TIMED_OUT}?lang=${locale}`;
   }
 
   if (
@@ -46,11 +48,13 @@ export const checkSessionTimeout = (request: Request, response: Response, next: 
     new Date() > new Date(request.session.cookie.expires)
   ) {
     logger.info('Session timed out for ' + request.originalUrl);
+    const locale = request.session?.lang;
+
     request.session.destroy((error) => {
       if (error) {
         logger.error('Error destroying session after timeout', error);
       }
-      sendSessionTimeoutResponse(request, response);
+      sendSessionTimeoutResponse(request, response, locale);
     });
     return;
   }

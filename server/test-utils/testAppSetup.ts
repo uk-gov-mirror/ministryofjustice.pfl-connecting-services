@@ -38,8 +38,8 @@ const testAppSetup = (): Express => {
     request.flash = flashMock;
     next();
   });
-  app.use(setupSessionTimeout());
   app.use(setUpLocaleFromSession());
+  app.use(setupSessionTimeout());
   app.use(setUpHealthCheck());
   app.use(setUpWebRequestParsing());
   app.use(setupAnalytics());

@@ -72,7 +72,7 @@ test.describe('Session Expiry', () => {
     await expect(page).toHaveURL(/child-safety/);
 
     await expect(page.locator('body')).toHaveAttribute('data-session-timeout-ms', SESSION_TIMEOUT_MS);
-    await expect(page.locator('body')).toHaveAttribute('data-session-timeout-path', '/session-timed-out');
+    await expect(page.locator('body')).toHaveAttribute('data-session-timeout-path', '/session-timed-out?lang=en');
   });
 
   test('should remove meta refresh when JavaScript is available', async ({ page }) => {

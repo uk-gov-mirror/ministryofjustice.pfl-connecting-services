@@ -4,15 +4,18 @@ import request from 'supertest';
 import config from '../config';
 import paths from '../constants/paths';
 import testAppSetup from '../test-utils/testAppSetup';
+import { sessionMock } from '../test-utils/testMocks';
 
 const app = testAppSetup();
 
 const TIMEOUT_TITLE = "Sorry, you'll have to start again";
+const WELSH_TIMEOUT_TITLE = "Mae'n ddrwg gennym, mae'n rhaid i chi ddechrau eto";
 const YOUR_SESSION_TEXT =
   "Your session automatically ends if you don’t use the service for 120 minutes.";
 const PERSONAL_INFO_TEXT = "We haven’t saved any personal information.";
 const START_AGAIN_TEXT = "You need to start again.";
 const START_AGAIN_BUTTON_TEXT = "Start again";
+const WELSH_START_AGAIN_BUTTON_TEXT = "Dechrau eto";
 
 describe('timeOut page', () => {
   describe(`GET ${paths.SESSION_TIMED_OUT}`, () => {
@@ -45,7 +48,42 @@ describe('timeOut page', () => {
 
       expect(startAgainButton).not.toBeNull();
       expect(startAgainButton?.textContent).toContain(START_AGAIN_BUTTON_TEXT);
-      expect(startAgainButton?.getAttribute('href')).toBe(paths.CHILD_SAFETY);
+      expect(startAgainButton?.getAttribute('href')).toBe(`${paths.CHILD_SAFETY}?lang=en`);
+    });
+
+    it('should render the timeout page in Welsh when lang query parameter is used', async () => {
+      config.includeWelshLanguage = true;
+      const welshApp = testAppSetup();
+
+      const response = await request(welshApp).get(`${paths.SESSION_TIMED_OUT}?lang=cy`).expect(403);
+      const dom = new JSDOM(response.text);
+
+      expect(dom.window.document.querySelector('h1')).toHaveTextContent(WELSH_TIMEOUT_TITLE);
+      expect(dom.window.document.querySelector('a.govuk-button')?.getAttribute('href')).toBe(
+        `${paths.CHILD_SAFETY}?lang=cy`,
+      );
+
+      config.includeWelshLanguage = false;
+    });
+
+    it('should render the timeout page in Welsh when session language is Welsh', async () => {
+      config.includeWelshLanguage = true;
+      sessionMock.lang = 'cy';
+      const welshApp = testAppSetup();
+
+      const response = await request(welshApp).get(paths.SESSION_TIMED_OUT).expect(403);
+      const dom = new JSDOM(response.text);
+
+      expect(dom.window.document.querySelector('h1')).toHaveTextContent(WELSH_TIMEOUT_TITLE);
+      expect(dom.window.document.querySelector('a.govuk-button')?.textContent).toContain(
+        WELSH_START_AGAIN_BUTTON_TEXT,
+      );
+      expect(dom.window.document.querySelector('a.govuk-button')?.getAttribute('href')).toBe(
+        `${paths.CHILD_SAFETY}?lang=cy`,
+      );
+
+      delete sessionMock.lang;
+      config.includeWelshLanguage = false;
     });
 
     it('should have correct page title', async () => {
@@ -107,7 +145,7 @@ describe('timeOut page', () => {
       const startAgainButton = dom.window.document.querySelector('a.govuk-button');
 
       expect(startAgainButton).not.toBeNull();
-      expect(startAgainButton?.getAttribute('href')).toBe(paths.CHILD_SAFETY);
+      expect(startAgainButton?.getAttribute('href')).toBe(`${paths.CHILD_SAFETY}?lang=en`);
     });
   });
 });

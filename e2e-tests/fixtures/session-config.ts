@@ -11,4 +11,4 @@ const getSessionTimeoutMinutes = (): number => {
 export const sessionTimeoutMinutes = getSessionTimeoutMinutes();
 export const sessionTimeoutMs = sessionTimeoutMinutes * 60 * 1000;
 export const sessionTimeoutSeconds = sessionTimeoutMinutes * 60;
-export const sessionTimeoutMetaRefreshContent = `${sessionTimeoutSeconds};url=/session-timed-out`;
+export const sessionTimeoutMetaRefreshContent = `${sessionTimeoutSeconds};url=/session-timed-out?lang=en`;

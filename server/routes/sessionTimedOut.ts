@@ -10,12 +10,14 @@ const sessionTimedOutRoutes = (router: Router) => {
       return sendSessionTimeoutResponse(request, response);
     }
 
+    const locale = request.session.lang;
+
     request.session.destroy((error) => {
       if (error) {
         logger.error('Error destroying session after timeout', error);
       }
 
-      sendSessionTimeoutResponse(request, response);
+      sendSessionTimeoutResponse(request, response, locale);
     });
   });
 };

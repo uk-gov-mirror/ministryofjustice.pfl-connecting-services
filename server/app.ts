@@ -40,8 +40,8 @@ const createApp = (): express.Application => {
   app.use(setUpWebSecurity());
   app.use(setupRateLimit());
   app.use(setUpWebSession());
-  app.use(setupSessionTimeout());
   app.use(setUpLocaleFromSession());
+  app.use(setupSessionTimeout());
   app.use(setUpWebRequestParsing());
   app.use(setupPageVisitAnalytics());
   app.use(setupRequestLogging());

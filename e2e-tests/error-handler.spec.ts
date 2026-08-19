@@ -53,7 +53,7 @@ test.describe('errorHandler – 403 session timeout', () => {
 
     const startAgainButton = page.getByRole('button', { name: /start again/i });
     await expect(startAgainButton).toBeVisible();
-    await expect(startAgainButton).toHaveAttribute('href', '/child-safety');
+    await expect(startAgainButton).toHaveAttribute('href', '/child-safety?lang=en');
   });
 
   test('should allow the user to restart the journey from the timeout page', async ({ page }) => {

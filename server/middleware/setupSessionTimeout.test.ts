@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 
 import config from '../config';
 import paths from '../constants/paths';
-import { sessionMock } from '../test-utils/testMocks';
 
 import { checkSessionTimeout } from './setupSessionTimeout';
 
